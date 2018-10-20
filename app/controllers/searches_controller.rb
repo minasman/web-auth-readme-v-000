@@ -12,7 +12,7 @@ class SearchesController < ApplicationController
       req.params['client_secret'] = client_secret
       req.params['v'] = '20160201'
       req.params['near'] = params[:zipcode]
-      req.params['query'] = 'coffee shop'
+      req.params['query'] = 'coffee shops'
     end
 
     body = JSON.parse(@resp.body)
@@ -28,4 +28,15 @@ class SearchesController < ApplicationController
       @error = "There was a timeout. Please try again."
       render 'search'
   end
+
+  def friends
+    resp = Faraday.get("https://api.foursquare.com/v2/users/self/friends") do |req|
+      req.params['oauth_token'] = session[:token]
+      # don't forget that pesky v param for versioning
+      req.params['v'] = '20160201'
+    end
+    @friends = JSON.parse(resp.body)["response"]["friends"]["items"]
+  end
+
+
 end
